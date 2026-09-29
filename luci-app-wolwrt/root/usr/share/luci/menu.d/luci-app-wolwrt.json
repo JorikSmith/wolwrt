@@ -1,0 +1,44 @@
+{
+	"admin/services/wolwrt": {
+		"title": "WOLwrt",
+		"order": 60,
+		"action": {
+			"type": "alias",
+			"path": "admin/services/wolwrt/status"
+		},
+		"depends": {
+			"acl": [ "luci-app-wolwrt" ],
+			"uci": { "wolwrt": true }
+		}
+	},
+	"admin/services/wolwrt/status": {
+		"title": "Status",
+		"order": 10,
+		"action": { "type": "view", "path": "wolwrt/status" }
+	},
+	"admin/services/wolwrt/devices": {
+		"title": "Devices",
+		"order": 20,
+		"action": { "type": "view", "path": "wolwrt/devices" }
+	},
+	"admin/services/wolwrt/groups": {
+		"title": "Groups",
+		"order": 30,
+		"action": { "type": "view", "path": "wolwrt/groups" }
+	},
+	"admin/services/wolwrt/targets": {
+		"title": "Targets",
+		"order": 40,
+		"action": { "type": "view", "path": "wolwrt/targets" }
+	},
+	"admin/services/wolwrt/rules": {
+		"title": "Rules",
+		"order": 50,
+		"action": { "type": "view", "path": "wolwrt/rules" }
+	},
+	"admin/services/wolwrt/settings": {
+		"title": "Settings",
+		"order": 60,
+		"action": { "type": "view", "path": "wolwrt/settings" }
+	}
+}

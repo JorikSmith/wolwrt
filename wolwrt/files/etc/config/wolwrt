@@ -1,0 +1,8 @@
+
+config wolwrt 'main'
+	option enabled '1'
+	option away_timeout '300'
+	option poll_interval '30'
+	option history_size '100'
+	option http_enabled '0'
+	option update_auto '1'

@@ -1,0 +1,845 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+
+msgid "Devices"
+msgstr ""
+
+msgid "Add device"
+msgstr ""
+
+msgid "Device: %s"
+msgstr ""
+
+msgid "New device"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "MAC address"
+msgstr ""
+
+msgid "Phone takes separate private MAC for each Wi-Fi network. If 2.4 and 5 GHz networks have different names, add MAC from both. MAC stays fixed while MAC rotation is off."
+msgstr ""
+
+msgid "cable or other access point"
+msgstr ""
+
+msgid "Tracking"
+msgstr ""
+
+msgid "Wi-Fi events"
+msgstr ""
+
+msgid "ARP check"
+msgstr ""
+
+msgid "Offline delay, s"
+msgstr ""
+
+msgid "Empty = value from Settings."
+msgstr ""
+
+msgid "%s s"
+msgstr ""
+
+msgid "%s s (default)"
+msgstr ""
+
+msgid "Phones that tell WOLwrt who is online. Connect phone to Wi-Fi and pick its MAC from list."
+msgstr ""
+
+msgid "Groups"
+msgstr ""
+
+msgid "Add group"
+msgstr ""
+
+msgid "Group: %s"
+msgstr ""
+
+msgid "New group"
+msgstr ""
+
+msgid "Members"
+msgstr ""
+
+msgid "Group is online while at least one member is online. Group rules fire when first member connects and last one disconnects."
+msgstr ""
+
+msgid "Mon"
+msgstr ""
+
+msgid "Tue"
+msgstr ""
+
+msgid "Wed"
+msgstr ""
+
+msgid "Thu"
+msgstr ""
+
+msgid "Fri"
+msgstr ""
+
+msgid "Sat"
+msgstr ""
+
+msgid "Sun"
+msgstr ""
+
+msgid "Use HH:MM, like 07:30"
+msgstr ""
+
+msgid "turned off"
+msgstr ""
+
+msgid "needs fix"
+msgstr ""
+
+msgid "not today"
+msgstr ""
+
+msgid "outside window"
+msgstr ""
+
+msgid "pause, %d min left"
+msgstr ""
+
+msgid "ready"
+msgstr ""
+
+msgid "Rules"
+msgstr ""
+
+msgid "Add rule"
+msgstr ""
+
+msgid "Rule: %s"
+msgstr ""
+
+msgid "ID"
+msgstr ""
+
+msgid "Edit"
+msgstr ""
+
+msgid "Link: %s"
+msgstr ""
+
+msgid "Run rule"
+msgstr ""
+
+msgid "Link"
+msgstr ""
+
+msgid "Run now, ignore days, time window and pause"
+msgstr ""
+
+msgid "Rule %s ran"
+msgstr ""
+
+msgid "Run"
+msgstr ""
+
+msgid "On"
+msgstr ""
+
+msgid "Phone connected: wake PC"
+msgstr ""
+
+msgid "When"
+msgstr ""
+
+msgid "First of group connects"
+msgstr ""
+
+msgid "Last of group disconnects"
+msgstr ""
+
+msgid "Device connects"
+msgstr ""
+
+msgid "Device disconnects"
+msgstr ""
+
+msgid "Target comes online"
+msgstr ""
+
+msgid "Target goes offline"
+msgstr ""
+
+msgid "On schedule"
+msgstr ""
+
+msgid "HTTP link"
+msgstr ""
+
+msgid "Group"
+msgstr ""
+
+msgid "Device"
+msgstr ""
+
+msgid "Target"
+msgstr ""
+
+msgid "Start time"
+msgstr ""
+
+msgid "HH:MM"
+msgstr ""
+
+msgid "Do"
+msgstr ""
+
+msgid "Wake with magic packet"
+msgstr ""
+
+msgid "Turn off with target method"
+msgstr ""
+
+msgid "Call webhook"
+msgstr ""
+
+msgid "Send Telegram message"
+msgstr ""
+
+msgid "Wake"
+msgstr ""
+
+msgid "Turn off touches only targets that WOLwrt woke. Targets turned on by hand stay on."
+msgstr ""
+
+msgid "URL"
+msgstr ""
+
+msgid "Must start with http:// or https://"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+msgid "PC is on"
+msgstr ""
+
+msgid "Active from"
+msgstr ""
+
+msgid "Empty from = since midnight, empty until = till end of day, both empty = all day. Windows over midnight like 22:00-06:00 work. Router time zone applies."
+msgstr ""
+
+msgid "Active until"
+msgstr ""
+
+msgid "Days"
+msgstr ""
+
+msgid "Empty = every day."
+msgstr ""
+
+msgid "Pause, min"
+msgstr ""
+
+msgid "Rule does not fire again sooner than this."
+msgstr ""
+
+msgid "Message on run"
+msgstr ""
+
+msgid "Telegram message each time rule runs. Needs bot in Settings."
+msgstr ""
+
+msgid "Conditions"
+msgstr ""
+
+msgid "all day"
+msgstr ""
+
+msgid "every day"
+msgstr ""
+
+msgid "pause %d min"
+msgstr ""
+
+msgid "Now"
+msgstr ""
+
+msgid "Last run"
+msgstr ""
+
+msgid "never"
+msgstr ""
+
+msgid "What to do and when. Every matching rule runs. Turn off rules skip targets turned on by hand."
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Telegram"
+msgstr ""
+
+msgid "HTTP links"
+msgstr ""
+
+msgid "Proxy"
+msgstr ""
+
+msgid "SSH key"
+msgstr ""
+
+msgid "Updates"
+msgstr ""
+
+msgid "Enable WOLwrt"
+msgstr ""
+
+msgid "Time zone"
+msgstr ""
+
+msgid "Rule time windows and schedules follow router clock. Set your time zone in System > System."
+msgstr ""
+
+msgid "How long device stays silent before it counts as offline. Phones drop Wi-Fi in sleep, so under 120 s gives false disconnects."
+msgstr ""
+
+msgid "Poll interval, s"
+msgstr ""
+
+msgid "How often WOLwrt checks targets and devices outside this Wi-Fi."
+msgstr ""
+
+msgid "Log size"
+msgstr ""
+
+msgid "Bot token"
+msgstr ""
+
+msgid "Get it from @BotFather. Without token and chat ID messages are off."
+msgstr ""
+
+msgid "Chat ID"
+msgstr ""
+
+msgid "Report errors"
+msgstr ""
+
+msgid "Message when target does not wake, turn off fails or webhook fails."
+msgstr ""
+
+msgid "Check"
+msgstr ""
+
+msgid "Send test message"
+msgstr ""
+
+msgid "Message sent. Save changes first if you edited fields."
+msgstr ""
+
+msgid "Set bot token and chat ID, then save."
+msgstr ""
+
+msgid "Sending failed. Check token, chat ID and proxy."
+msgstr ""
+
+msgid "Enable"
+msgstr ""
+
+msgid "Links for iOS Shortcuts, Tasker or Home Assistant. Work in local network only. Anyone with token can wake and turn off targets."
+msgstr ""
+
+msgid "Token"
+msgstr ""
+
+msgid "Generate"
+msgstr ""
+
+msgid "Links"
+msgstr ""
+
+msgid "Ready links sit behind Links buttons on Targets and Rules pages. Save token first."
+msgstr ""
+
+msgid "SOCKS proxy"
+msgstr ""
+
+msgid "For Telegram and update checks where they are blocked. Format socks5://user:pass@host:1080 or socks4://host:1080."
+msgstr ""
+
+msgid "Use socks5://user:pass@host:port or socks4://host:port"
+msgstr ""
+
+msgid "Proxy works through curl, about 530 KB with libraries. It is installed only by this button."
+msgstr ""
+
+msgid "installed"
+msgstr ""
+
+msgid "installing"
+msgstr ""
+
+msgid "not installed"
+msgstr ""
+
+msgid "Install curl"
+msgstr ""
+
+msgid "Install failed:"
+msgstr ""
+
+msgid "Router public key"
+msgstr ""
+
+msgid "Needed to turn targets off over SSH. Add it to ~/.ssh/authorized_keys on target. For Windows admin account use C:\\ProgramData\\ssh\\administrators_authorized_keys."
+msgstr ""
+
+msgid "Copy"
+msgstr ""
+
+msgid "Check daily"
+msgstr ""
+
+msgid "Looks for new release on GitHub. Install starts only by your click."
+msgstr ""
+
+msgid "Open update window"
+msgstr ""
+
+msgid "Timing, notifications, remote access and updates."
+msgstr ""
+
+msgid "Connected"
+msgstr ""
+
+msgid "Disconnected"
+msgstr ""
+
+msgid "First one connected"
+msgstr ""
+
+msgid "Everyone offline"
+msgstr ""
+
+msgid "Magic packet"
+msgstr ""
+
+msgid "Wake again"
+msgstr ""
+
+msgid "Wake failed"
+msgstr ""
+
+msgid "Turn off failed"
+msgstr ""
+
+msgid "Left on"
+msgstr ""
+
+msgid "Shutdown cancelled"
+msgstr ""
+
+msgid "Online"
+msgstr ""
+
+msgid "Offline"
+msgstr ""
+
+msgid "No response"
+msgstr ""
+
+msgid "Rule ran"
+msgstr ""
+
+msgid "Rule skipped"
+msgstr ""
+
+msgid "Webhook"
+msgstr ""
+
+msgid "Webhook failed"
+msgstr ""
+
+msgid "Telegram failed"
+msgstr ""
+
+msgid "Updated"
+msgstr ""
+
+msgid "outside time window"
+msgstr ""
+
+msgid "pause not over"
+msgstr ""
+
+msgid "turned on by hand"
+msgstr ""
+
+msgid "already off"
+msgstr ""
+
+msgid "someone is using it"
+msgstr ""
+
+msgid "bot not set up"
+msgstr ""
+
+msgid "by WOLwrt"
+msgstr ""
+
+msgid "by hand"
+msgstr ""
+
+msgid "on computer"
+msgstr ""
+
+msgid "None, wake only"
+msgstr ""
+
+msgid "SSH command"
+msgstr ""
+
+msgid "Windows shutdown with warning"
+msgstr ""
+
+msgid "HTTP request"
+msgstr ""
+
+msgid "Sleep-on-LAN"
+msgstr ""
+
+msgid "try %s"
+msgstr ""
+
+msgid "Devices online"
+msgstr ""
+
+msgid "%d of %d"
+msgstr ""
+
+msgid "Targets on"
+msgstr ""
+
+msgid "%d of %d online"
+msgstr ""
+
+msgid "nobody online"
+msgstr ""
+
+msgid "No groups yet"
+msgstr ""
+
+msgid "State"
+msgstr ""
+
+msgid "Connection"
+msgstr ""
+
+msgid "Signal"
+msgstr ""
+
+msgid "Activity"
+msgstr ""
+
+msgid "online"
+msgstr ""
+
+msgid "offline in %d s"
+msgstr ""
+
+msgid "offline"
+msgstr ""
+
+msgid "Wi-Fi event"
+msgstr ""
+
+msgid "seen %s"
+msgstr ""
+
+msgid "not seen yet"
+msgstr ""
+
+msgid "since %s"
+msgstr ""
+
+msgid "No devices yet"
+msgstr ""
+
+msgid "Turned on by"
+msgstr ""
+
+msgid "Off method"
+msgstr ""
+
+msgid "off in %d s"
+msgstr ""
+
+msgid "Cancel shutdown"
+msgstr ""
+
+msgid "no IP address"
+msgstr ""
+
+msgid "rules may turn it off"
+msgstr ""
+
+msgid "rules leave it on"
+msgstr ""
+
+msgid "No targets yet"
+msgstr ""
+
+msgid "Time"
+msgstr ""
+
+msgid "Event"
+msgstr ""
+
+msgid "Details"
+msgstr ""
+
+msgid "Nothing happened yet"
+msgstr ""
+
+msgid "Failed"
+msgstr ""
+
+msgid "Off method of this target runs now."
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "wolwrtd is not running. Turn it on in Settings and press Save & Apply."
+msgstr ""
+
+msgid "Targets"
+msgstr ""
+
+msgid "Log"
+msgstr ""
+
+msgid "Who is online, what is on and what WOLwrt did lately."
+msgstr ""
+
+msgid "Add target"
+msgstr ""
+
+msgid "Target: %s"
+msgstr ""
+
+msgid "Links: %s"
+msgstr ""
+
+msgid "Magic packet sent"
+msgstr ""
+
+msgid "Network card with Wake-on-LAN turned on in BIOS."
+msgstr ""
+
+msgid "IP address"
+msgstr ""
+
+msgid "Empty = take from DHCP lease by MAC. Used for online check and turning off."
+msgstr ""
+
+msgid "from DHCP"
+msgstr ""
+
+msgid "Network"
+msgstr ""
+
+msgid "Command"
+msgstr ""
+
+msgid "Pick from list or type your own. Router key from Settings goes to authorized_keys on target."
+msgstr ""
+
+msgid "Warning, s"
+msgstr ""
+
+msgid "Windows shows warning and shuts down after this delay. Cancel button appears on Status page."
+msgstr ""
+
+msgid "SSH user"
+msgstr ""
+
+msgid "SSH port"
+msgstr ""
+
+msgid "Keep on if used, min"
+msgstr ""
+
+msgid "Rules leave Windows on when keyboard or mouse was used at console within this time. Needs Windows Pro or higher. Empty = check off."
+msgstr ""
+
+msgid "Method"
+msgstr ""
+
+msgid "Body"
+msgstr ""
+
+msgid "Sent with POST as form data."
+msgstr ""
+
+msgid "Agent port"
+msgstr ""
+
+msgid "Needs SleepOnLan agent on target. WOLwrt calls http://IP:port/sleep."
+msgstr ""
+
+msgid "Computers that WOLwrt wakes with magic packet and turns off your way. ID goes into HTTP links."
+msgstr ""
+
+msgid "today %s"
+msgstr ""
+
+msgid "yesterday %s"
+msgstr ""
+
+msgid "just now"
+msgstr ""
+
+msgid "%d min ago"
+msgstr ""
+
+msgid "%d h %d min ago"
+msgstr ""
+
+msgid "%d d ago"
+msgstr ""
+
+msgid "Copied"
+msgstr ""
+
+msgid "Copy failed, select text by hand"
+msgstr ""
+
+msgid "Download packages"
+msgstr ""
+
+msgid "Check checksums"
+msgstr ""
+
+msgid "Install"
+msgstr ""
+
+msgid "Restart wolwrtd"
+msgstr ""
+
+msgid "Updating. Keep this page open."
+msgstr ""
+
+msgid "Update WOLwrt"
+msgstr ""
+
+msgid "done"
+msgstr ""
+
+msgid "failed"
+msgstr ""
+
+msgid "in progress"
+msgstr ""
+
+msgid "waiting"
+msgstr ""
+
+msgid "Updated to %s. Reload page to get new interface."
+msgstr ""
+
+msgid "Reload page"
+msgstr ""
+
+msgid "Update failed: %s"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Check failed: %s. If GitHub is blocked where you live, set proxy in Settings."
+msgstr ""
+
+msgid "Installed"
+msgstr ""
+
+msgid "Latest"
+msgstr ""
+
+msgid "Changes"
+msgstr ""
+
+msgid "Settings in /etc/config/wolwrt stay. wolwrtd restarts, rules pause briefly."
+msgstr ""
+
+msgid "Version %s is latest. Checked %s."
+msgstr ""
+
+msgid "Installed version %s, no check yet."
+msgstr ""
+
+msgid "Check now"
+msgstr ""
+
+msgid "Release page"
+msgstr ""
+
+msgid "Update to %s"
+msgstr ""
+
+msgid "Update available"
+msgstr ""
+
+msgid "WOLwrt updates"
+msgstr ""
+
+msgid "6 GHz"
+msgstr ""
+
+msgid "5 GHz"
+msgstr ""
+
+msgid "2.4 GHz"
+msgstr ""
+
+msgid "Sleep"
+msgstr ""
+
+msgid "Hibernate"
+msgstr ""
+
+msgid "Shut down"
+msgstr ""
+
+msgid "Turn off"
+msgstr ""
+
+msgid "Went to sleep"
+msgstr ""
+
+msgid "Hibernated"
+msgstr ""
+
+msgid "Powered off"
+msgstr ""
+
+msgid "Turned off"
+msgstr ""
+
+msgid "Open link from phone in local network. For iOS Shortcuts use action Get contents of URL."
+msgstr ""
+
+msgid "%s available"
+msgstr ""
+
+msgid "WOLwrt %s, update %s available"
+msgstr ""
+
+msgid "WOLwrt by"
+msgstr ""
+
+msgid "Status"
+msgstr ""
+
+msgid "Settings"
+msgstr ""

@@ -1,0 +1,847 @@
+msgid ""
+msgstr "Content-Type: text/plain; charset=UTF-8\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Devices"
+msgstr "Устройства"
+
+msgid "Add device"
+msgstr "Добавить устройство"
+
+msgid "Device: %s"
+msgstr "Устройство: %s"
+
+msgid "New device"
+msgstr "Новое устройство"
+
+msgid "Name"
+msgstr "Название"
+
+msgid "MAC address"
+msgstr "MAC адрес"
+
+msgid "Phone takes separate private MAC for each Wi-Fi network. If 2.4 and 5 GHz networks have different names, add MAC from both. MAC stays fixed while MAC rotation is off."
+msgstr "Телефон берет отдельный частный MAC для каждой сети Wi-Fi. Если у сетей 2,4 и 5 ГГц разные имена, добавьте MAC из обеих. MAC не меняется, пока ротация MAC выключена."
+
+msgid "cable or other access point"
+msgstr "кабель или другая точка доступа"
+
+msgid "Tracking"
+msgstr "Отслеживание"
+
+msgid "Wi-Fi events"
+msgstr "события Wi-Fi"
+
+msgid "ARP check"
+msgstr "проверка ARP"
+
+msgid "Offline delay, s"
+msgstr "Задержка отключения, с"
+
+msgid "Empty = value from Settings."
+msgstr "Пусто = значение из настроек."
+
+msgid "%s s"
+msgstr "%s с"
+
+msgid "%s s (default)"
+msgstr "%s с (по умолчанию)"
+
+msgid "Phones that tell WOLwrt who is online. Connect phone to Wi-Fi and pick its MAC from list."
+msgstr "Телефоны, по которым WOLwrt понимает, кто в сети. Подключите телефон к Wi-Fi и выберите его MAC из списка."
+
+msgid "Groups"
+msgstr "Группы"
+
+msgid "Add group"
+msgstr "Добавить группу"
+
+msgid "Group: %s"
+msgstr "Группа: %s"
+
+msgid "New group"
+msgstr "Новая группа"
+
+msgid "Members"
+msgstr "Участники"
+
+msgid "Group is online while at least one member is online. Group rules fire when first member connects and last one disconnects."
+msgstr "Группа в сети, пока в сети хотя бы один участник. Правила группы срабатывают, когда подключается первый и отключается последний."
+
+msgid "Mon"
+msgstr "Пн"
+
+msgid "Tue"
+msgstr "Вт"
+
+msgid "Wed"
+msgstr "Ср"
+
+msgid "Thu"
+msgstr "Чт"
+
+msgid "Fri"
+msgstr "Пт"
+
+msgid "Sat"
+msgstr "Сб"
+
+msgid "Sun"
+msgstr "Вс"
+
+msgid "Use HH:MM, like 07:30"
+msgstr "Формат ЧЧ:ММ, например 07:30"
+
+msgid "turned off"
+msgstr "выключено"
+
+msgid "needs fix"
+msgstr "нужна правка"
+
+msgid "not today"
+msgstr "не сегодня"
+
+msgid "outside window"
+msgstr "вне окна"
+
+msgid "pause, %d min left"
+msgstr "пауза, еще %d мин"
+
+msgid "ready"
+msgstr "готово"
+
+msgid "Rules"
+msgstr "Правила"
+
+msgid "Add rule"
+msgstr "Добавить правило"
+
+msgid "Rule: %s"
+msgstr "Правило: %s"
+
+msgid "ID"
+msgstr "ID"
+
+msgid "Edit"
+msgstr "Изменить"
+
+msgid "Link: %s"
+msgstr "Ссылка: %s"
+
+msgid "Run rule"
+msgstr "Запустить правило"
+
+msgid "Link"
+msgstr "Ссылка"
+
+msgid "Run now, ignore days, time window and pause"
+msgstr "Запустить сейчас без учета дней, окна времени и паузы"
+
+msgid "Rule %s ran"
+msgstr "Правило %s выполнено"
+
+msgid "Run"
+msgstr "Запустить"
+
+msgid "On"
+msgstr "Вкл"
+
+msgid "Phone connected: wake PC"
+msgstr "Телефон подключился: включить ПК"
+
+msgid "When"
+msgstr "Когда"
+
+msgid "First of group connects"
+msgstr "Первый из группы подключился"
+
+msgid "Last of group disconnects"
+msgstr "Последний из группы отключился"
+
+msgid "Device connects"
+msgstr "Устройство подключилось"
+
+msgid "Device disconnects"
+msgstr "Устройство отключилось"
+
+msgid "Target comes online"
+msgstr "Цель включилась"
+
+msgid "Target goes offline"
+msgstr "Цель выключилась"
+
+msgid "On schedule"
+msgstr "По расписанию"
+
+msgid "HTTP link"
+msgstr "По ссылке HTTP"
+
+msgid "Group"
+msgstr "Группа"
+
+msgid "Device"
+msgstr "Устройство"
+
+msgid "Target"
+msgstr "Цель"
+
+msgid "Start time"
+msgstr "Время запуска"
+
+msgid "HH:MM"
+msgstr "ЧЧ:ММ"
+
+msgid "Do"
+msgstr "Действие"
+
+msgid "Wake with magic packet"
+msgstr "Разбудить через magic packet"
+
+msgid "Turn off with target method"
+msgstr "Выключить способом цели"
+
+msgid "Call webhook"
+msgstr "Вызвать webhook"
+
+msgid "Send Telegram message"
+msgstr "Написать в Telegram"
+
+msgid "Wake"
+msgstr "Разбудить"
+
+msgid "Turn off touches only targets that WOLwrt woke. Targets turned on by hand stay on."
+msgstr "Выключение трогает только цели, которые разбудил WOLwrt. Включенные руками остаются включенными."
+
+msgid "URL"
+msgstr "URL"
+
+msgid "Must start with http:// or https://"
+msgstr "Должен начинаться с http:// или https://"
+
+msgid "Message"
+msgstr "Текст"
+
+msgid "PC is on"
+msgstr "ПК включен"
+
+msgid "Active from"
+msgstr "Работает с"
+
+msgid "Empty from = since midnight, empty until = till end of day, both empty = all day. Windows over midnight like 22:00-06:00 work. Router time zone applies."
+msgstr "Пустое поле с = с полуночи, пустое до = до конца дня, оба пустые = весь день. Окно через полночь, например 22:00-06:00, тоже работает. Время по часовому поясу роутера."
+
+msgid "Active until"
+msgstr "Работает до"
+
+msgid "Days"
+msgstr "Дни"
+
+msgid "Empty = every day."
+msgstr "Пусто = каждый день."
+
+msgid "Pause, min"
+msgstr "Пауза, мин"
+
+msgid "Rule does not fire again sooner than this."
+msgstr "Правило не сработает повторно раньше этого срока."
+
+msgid "Message on run"
+msgstr "Сообщать о запуске"
+
+msgid "Telegram message each time rule runs. Needs bot in Settings."
+msgstr "Сообщение в Telegram при каждом запуске правила. Нужен бот в настройках."
+
+msgid "Conditions"
+msgstr "Условия"
+
+msgid "all day"
+msgstr "весь день"
+
+msgid "every day"
+msgstr "каждый день"
+
+msgid "pause %d min"
+msgstr "пауза %d мин"
+
+msgid "Now"
+msgstr "Сейчас"
+
+msgid "Last run"
+msgstr "Последний запуск"
+
+msgid "never"
+msgstr "ни разу"
+
+msgid "What to do and when. Every matching rule runs. Turn off rules skip targets turned on by hand."
+msgstr "Что делать и когда. Срабатывают все подходящие правила. Правила выключения не трогают цели, включенные руками."
+
+msgid "General"
+msgstr "Общие"
+
+msgid "Telegram"
+msgstr "Telegram"
+
+msgid "HTTP links"
+msgstr "Ссылки HTTP"
+
+msgid "Proxy"
+msgstr "Прокси"
+
+msgid "SSH key"
+msgstr "Ключ SSH"
+
+msgid "Updates"
+msgstr "Обновления"
+
+msgid "Enable WOLwrt"
+msgstr "Включить WOLwrt"
+
+msgid "Time zone"
+msgstr "Часовой пояс"
+
+msgid "Rule time windows and schedules follow router clock. Set your time zone in System > System."
+msgstr "Окна времени и расписания идут по часам роутера. Укажите свой часовой пояс в Система > Система."
+
+msgid "How long device stays silent before it counts as offline. Phones drop Wi-Fi in sleep, so under 120 s gives false disconnects."
+msgstr "Сколько устройство молчит, прежде чем считаться отключенным. Телефоны во сне отключают Wi-Fi, поэтому меньше 120 с даст ложные отключения."
+
+msgid "Poll interval, s"
+msgstr "Интервал опроса, с"
+
+msgid "How often WOLwrt checks targets and devices outside this Wi-Fi."
+msgstr "Как часто WOLwrt проверяет цели и устройства вне этого Wi-Fi."
+
+msgid "Log size"
+msgstr "Записей в журнале"
+
+msgid "Bot token"
+msgstr "Токен бота"
+
+msgid "Get it from @BotFather. Without token and chat ID messages are off."
+msgstr "Выдает @BotFather. Без токена и chat ID сообщения не отправляются."
+
+msgid "Chat ID"
+msgstr "Chat ID"
+
+msgid "Report errors"
+msgstr "Сообщать об ошибках"
+
+msgid "Message when target does not wake, turn off fails or webhook fails."
+msgstr "Сообщение, если цель не проснулась, не выключилась или webhook не прошел."
+
+msgid "Check"
+msgstr "Проверка"
+
+msgid "Send test message"
+msgstr "Отправить тестовое сообщение"
+
+msgid "Message sent. Save changes first if you edited fields."
+msgstr "Сообщение отправлено. Если меняли поля, сначала сохраните."
+
+msgid "Set bot token and chat ID, then save."
+msgstr "Укажите токен бота и chat ID и сохраните."
+
+msgid "Sending failed. Check token, chat ID and proxy."
+msgstr "Не отправилось. Проверьте токен, chat ID и прокси."
+
+msgid "Enable"
+msgstr "Включить"
+
+msgid "Links for iOS Shortcuts, Tasker or Home Assistant. Work in local network only. Anyone with token can wake and turn off targets."
+msgstr "Ссылки для Команд iOS, Tasker или Home Assistant. Работают только в локальной сети. Кто знает токен, может будить и выключать цели."
+
+msgid "Token"
+msgstr "Токен"
+
+msgid "Generate"
+msgstr "Сгенерировать"
+
+msgid "Links"
+msgstr "Ссылки"
+
+msgid "Ready links sit behind Links buttons on Targets and Rules pages. Save token first."
+msgstr "Готовые ссылки открываются кнопкой Ссылки на страницах Цели и Правила. Сначала сохраните токен."
+
+msgid "SOCKS proxy"
+msgstr "SOCKS прокси"
+
+msgid "For Telegram and update checks where they are blocked. Format socks5://user:pass@host:1080 or socks4://host:1080."
+msgstr "Для Telegram и проверки обновлений там, где они заблокированы. Формат socks5://user:pass@host:1080 или socks4://host:1080."
+
+msgid "Use socks5://user:pass@host:port or socks4://host:port"
+msgstr "Формат socks5://user:pass@host:port или socks4://host:port"
+
+msgid "Proxy works through curl, about 530 KB with libraries. It is installed only by this button."
+msgstr "Прокси работает через curl, около 530 КБ вместе с библиотеками. Ставится только этой кнопкой."
+
+msgid "installed"
+msgstr "установлен"
+
+msgid "installing"
+msgstr "ставится"
+
+msgid "not installed"
+msgstr "не установлен"
+
+msgid "Install curl"
+msgstr "Установить curl"
+
+msgid "Install failed:"
+msgstr "Установка не удалась:"
+
+msgid "Router public key"
+msgstr "Публичный ключ роутера"
+
+msgid "Needed to turn targets off over SSH. Add it to ~/.ssh/authorized_keys on target. For Windows admin account use C:\\ProgramData\\ssh\\administrators_authorized_keys."
+msgstr "Нужен, чтобы выключать цели по SSH. Добавьте его в ~/.ssh/authorized_keys на цели. Для администратора Windows это C:\\ProgramData\\ssh\\administrators_authorized_keys."
+
+msgid "Copy"
+msgstr "Копировать"
+
+msgid "Check daily"
+msgstr "Проверять каждый день"
+
+msgid "Looks for new release on GitHub. Install starts only by your click."
+msgstr "Ищет новый релиз на GitHub. Установка только по вашей кнопке."
+
+msgid "Open update window"
+msgstr "Открыть окно обновления"
+
+msgid "Timing, notifications, remote access and updates."
+msgstr "Тайминги, уведомления, удаленный доступ и обновления."
+
+msgid "Connected"
+msgstr "Подключился"
+
+msgid "Disconnected"
+msgstr "Отключился"
+
+msgid "First one connected"
+msgstr "Первый подключился"
+
+msgid "Everyone offline"
+msgstr "Все отключились"
+
+msgid "Magic packet"
+msgstr "Magic packet"
+
+msgid "Wake again"
+msgstr "Повтор magic packet"
+
+msgid "Wake failed"
+msgstr "Не проснулся"
+
+msgid "Turn off failed"
+msgstr "Не выключился"
+
+msgid "Left on"
+msgstr "Оставлен включенным"
+
+msgid "Shutdown cancelled"
+msgstr "Выключение отменено"
+
+msgid "Online"
+msgstr "В сети"
+
+msgid "Offline"
+msgstr "Не в сети"
+
+msgid "No response"
+msgstr "Не отвечает"
+
+msgid "Rule ran"
+msgstr "Правило сработало"
+
+msgid "Rule skipped"
+msgstr "Правило пропущено"
+
+msgid "Webhook"
+msgstr "Webhook"
+
+msgid "Webhook failed"
+msgstr "Webhook не прошел"
+
+msgid "Telegram failed"
+msgstr "Telegram не отправлен"
+
+msgid "Updated"
+msgstr "Обновлено"
+
+msgid "outside time window"
+msgstr "вне окна времени"
+
+msgid "pause not over"
+msgstr "пауза еще идет"
+
+msgid "turned on by hand"
+msgstr "включен руками"
+
+msgid "already off"
+msgstr "уже выключен"
+
+msgid "someone is using it"
+msgstr "за ним работают"
+
+msgid "bot not set up"
+msgstr "бот не настроен"
+
+msgid "by WOLwrt"
+msgstr "через WOLwrt"
+
+msgid "by hand"
+msgstr "руками"
+
+msgid "on computer"
+msgstr "на компьютере"
+
+msgid "None, wake only"
+msgstr "Нет, только будить"
+
+msgid "SSH command"
+msgstr "Команда SSH"
+
+msgid "Windows shutdown with warning"
+msgstr "Выключение Windows с предупреждением"
+
+msgid "HTTP request"
+msgstr "Запрос HTTP"
+
+msgid "Sleep-on-LAN"
+msgstr "Sleep-on-LAN"
+
+msgid "try %s"
+msgstr "попытка %s"
+
+msgid "Devices online"
+msgstr "Устройств в сети"
+
+msgid "%d of %d"
+msgstr "%d из %d"
+
+msgid "Targets on"
+msgstr "Целей включено"
+
+msgid "%d of %d online"
+msgstr "в сети %d из %d"
+
+msgid "nobody online"
+msgstr "никого нет в сети"
+
+msgid "No groups yet"
+msgstr "Групп пока нет"
+
+msgid "State"
+msgstr "Статус"
+
+msgid "Connection"
+msgstr "Подключение"
+
+msgid "Signal"
+msgstr "Сигнал"
+
+msgid "Activity"
+msgstr "Активность"
+
+msgid "online"
+msgstr "в сети"
+
+msgid "offline in %d s"
+msgstr "отключится через %d с"
+
+msgid "offline"
+msgstr "не в сети"
+
+msgid "Wi-Fi event"
+msgstr "событие Wi-Fi"
+
+msgid "seen %s"
+msgstr "был в сети %s"
+
+msgid "not seen yet"
+msgstr "еще не видели"
+
+msgid "since %s"
+msgstr "с %s"
+
+msgid "No devices yet"
+msgstr "Устройств пока нет"
+
+msgid "Turned on by"
+msgstr "Кто включил"
+
+msgid "Off method"
+msgstr "Способ выключения"
+
+msgid "off in %d s"
+msgstr "выключится через %d с"
+
+msgid "Cancel shutdown"
+msgstr "Отменить выключение"
+
+msgid "no IP address"
+msgstr "нет IP адреса"
+
+msgid "rules may turn it off"
+msgstr "правила могут выключить"
+
+msgid "rules leave it on"
+msgstr "правила не трогают"
+
+msgid "No targets yet"
+msgstr "Целей пока нет"
+
+msgid "Time"
+msgstr "Время"
+
+msgid "Event"
+msgstr "Событие"
+
+msgid "Details"
+msgstr "Подробности"
+
+msgid "Nothing happened yet"
+msgstr "Пока ничего не было"
+
+msgid "Failed"
+msgstr "Не получилось"
+
+msgid "Off method of this target runs now."
+msgstr "Сейчас сработает способ выключения этой цели."
+
+msgid "Cancel"
+msgstr "Отмена"
+
+msgid "wolwrtd is not running. Turn it on in Settings and press Save & Apply."
+msgstr "wolwrtd не запущен. Включите его в настройках и нажмите Сохранить и применить."
+
+msgid "Targets"
+msgstr "Цели"
+
+msgid "Log"
+msgstr "Журнал"
+
+msgid "Who is online, what is on and what WOLwrt did lately."
+msgstr "Кто в сети, что включено и что WOLwrt делал недавно."
+
+msgid "Add target"
+msgstr "Добавить цель"
+
+msgid "Target: %s"
+msgstr "Цель: %s"
+
+msgid "Links: %s"
+msgstr "Ссылки: %s"
+
+msgid "Magic packet sent"
+msgstr "Magic packet отправлен"
+
+msgid "Network card with Wake-on-LAN turned on in BIOS."
+msgstr "Сетевая карта с включенным Wake-on-LAN в BIOS."
+
+msgid "IP address"
+msgstr "IP адрес"
+
+msgid "Empty = take from DHCP lease by MAC. Used for online check and turning off."
+msgstr "Пусто = брать из аренды DHCP по MAC. Нужен для проверки сети и выключения."
+
+msgid "from DHCP"
+msgstr "из DHCP"
+
+msgid "Network"
+msgstr "Сеть"
+
+msgid "Command"
+msgstr "Команда"
+
+msgid "Pick from list or type your own. Router key from Settings goes to authorized_keys on target."
+msgstr "Выберите из списка или впишите свою. Ключ роутера из настроек добавьте в authorized_keys на цели."
+
+msgid "Warning, s"
+msgstr "Предупреждение, с"
+
+msgid "Windows shows warning and shuts down after this delay. Cancel button appears on Status page."
+msgstr "Windows показывает предупреждение и выключается через это время. На странице Статус появится кнопка отмены."
+
+msgid "SSH user"
+msgstr "Пользователь SSH"
+
+msgid "SSH port"
+msgstr "Порт SSH"
+
+msgid "Keep on if used, min"
+msgstr "Не выключать, если работали, мин"
+
+msgid "Rules leave Windows on when keyboard or mouse was used at console within this time. Needs Windows Pro or higher. Empty = check off."
+msgstr "Правила не выключат Windows, если за это время трогали клавиатуру или мышь. Нужна Windows Pro или выше. Пусто = без проверки."
+
+msgid "Method"
+msgstr "Метод"
+
+msgid "Body"
+msgstr "Тело запроса"
+
+msgid "Sent with POST as form data."
+msgstr "Отправляется с POST как данные формы."
+
+msgid "Agent port"
+msgstr "Порт агента"
+
+msgid "Needs SleepOnLan agent on target. WOLwrt calls http://IP:port/sleep."
+msgstr "На цели нужен агент SleepOnLan. WOLwrt вызывает http://IP:порт/sleep."
+
+msgid "Computers that WOLwrt wakes with magic packet and turns off your way. ID goes into HTTP links."
+msgstr "Компьютеры, которые WOLwrt будит через magic packet и выключает выбранным способом. ID используется в ссылках HTTP."
+
+msgid "today %s"
+msgstr "сегодня в %s"
+
+msgid "yesterday %s"
+msgstr "вчера в %s"
+
+msgid "just now"
+msgstr "только что"
+
+msgid "%d min ago"
+msgstr "%d мин назад"
+
+msgid "%d h %d min ago"
+msgstr "%d ч %d мин назад"
+
+msgid "%d d ago"
+msgstr "%d дн назад"
+
+msgid "Copied"
+msgstr "Скопировано"
+
+msgid "Copy failed, select text by hand"
+msgstr "Не скопировалось, выделите текст вручную"
+
+msgid "Download packages"
+msgstr "Скачивание пакетов"
+
+msgid "Check checksums"
+msgstr "Проверка контрольных сумм"
+
+msgid "Install"
+msgstr "Установка"
+
+msgid "Restart wolwrtd"
+msgstr "Перезапуск wolwrtd"
+
+msgid "Updating. Keep this page open."
+msgstr "Идет обновление. Не закрывайте страницу."
+
+msgid "Update WOLwrt"
+msgstr "Обновление WOLwrt"
+
+msgid "done"
+msgstr "готово"
+
+msgid "failed"
+msgstr "ошибка"
+
+msgid "in progress"
+msgstr "идет"
+
+msgid "waiting"
+msgstr "ждет"
+
+msgid "Updated to %s. Reload page to get new interface."
+msgstr "Обновлено до %s. Перезагрузите страницу, чтобы открыть новый интерфейс."
+
+msgid "Reload page"
+msgstr "Перезагрузить страницу"
+
+msgid "Update failed: %s"
+msgstr "Обновление не удалось: %s"
+
+msgid "Close"
+msgstr "Закрыть"
+
+msgid "Check failed: %s. If GitHub is blocked where you live, set proxy in Settings."
+msgstr "Проверка не удалась: %s. Если GitHub у вас заблокирован, укажите прокси в настройках."
+
+msgid "Installed"
+msgstr "Установлено"
+
+msgid "Latest"
+msgstr "Последняя"
+
+msgid "Changes"
+msgstr "Изменения"
+
+msgid "Settings in /etc/config/wolwrt stay. wolwrtd restarts, rules pause briefly."
+msgstr "Настройки в /etc/config/wolwrt сохранятся. wolwrtd перезапустится, правила ненадолго встанут на паузу."
+
+msgid "Version %s is latest. Checked %s."
+msgstr "Версия %s последняя. Проверено %s."
+
+msgid "Installed version %s, no check yet."
+msgstr "Установлена версия %s, проверки еще не было."
+
+msgid "Check now"
+msgstr "Проверить сейчас"
+
+msgid "Release page"
+msgstr "Страница релиза"
+
+msgid "Update to %s"
+msgstr "Обновить до %s"
+
+msgid "Update available"
+msgstr "Есть обновление"
+
+msgid "WOLwrt updates"
+msgstr "Обновления WOLwrt"
+
+msgid "6 GHz"
+msgstr "6 ГГц"
+
+msgid "5 GHz"
+msgstr "5 ГГц"
+
+msgid "2.4 GHz"
+msgstr "2,4 ГГц"
+
+msgid "Sleep"
+msgstr "Усыпить"
+
+msgid "Hibernate"
+msgstr "Гибернация"
+
+msgid "Shut down"
+msgstr "Выключить"
+
+msgid "Turn off"
+msgstr "Выключить"
+
+msgid "Went to sleep"
+msgstr "Уснул"
+
+msgid "Hibernated"
+msgstr "Ушел в гибернацию"
+
+msgid "Powered off"
+msgstr "Выключен"
+
+msgid "Turned off"
+msgstr "Выключен"
+
+msgid "Open link from phone in local network. For iOS Shortcuts use action Get contents of URL."
+msgstr "Открывайте ссылку с телефона в локальной сети. В Командах iOS используйте действие Получить содержимое URL."
+
+msgid "%s available"
+msgstr "есть %s"
+
+msgid "WOLwrt %s, update %s available"
+msgstr "WOLwrt %s, есть обновление %s"
+
+msgid "WOLwrt by"
+msgstr "WOLwrt, автор"
+
+msgid "Status"
+msgstr "Статус"
+
+msgid "Settings"
+msgstr "Настройки"

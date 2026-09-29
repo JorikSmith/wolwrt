@@ -1,0 +1,187 @@
+#!/bin/sh
+
+. /usr/lib/wolwrt/common.sh
+
+reply_cli() {
+	local out rc
+	out=$("$@" 2>&1)
+	rc=$?
+	json_init
+	json_add_boolean ok $((rc == 0))
+	[ -n "$out" ] && json_add_string message "$out"
+	json_dump
+}
+
+pkg_install() {
+	if command -v apk >/dev/null; then
+		apk add "$1"
+	else
+		opkg update >/dev/null && opkg install "$1"
+		local rc=$?
+		rm -rf /var/opkg-lists
+		return $rc
+	fi
+}
+
+job_start() {
+	mkdir -p "$WOLWRT_STATE"
+	rm -f "$WOLWRT_STATE/$1.rc"
+	: > "$WOLWRT_STATE/$1.log"
+	start-stop-daemon -S -b -x /usr/libexec/rpcd/wolwrt -- _job "$@"
+}
+
+job_state() {
+	if [ -f "$WOLWRT_STATE/$1.log" ] && [ ! -f "$WOLWRT_STATE/$1.rc" ]; then
+		json_add_boolean "$2" 1
+	elif [ -f "$WOLWRT_STATE/$1.rc" ] && [ "$(cat "$WOLWRT_STATE/$1.rc")" != 0 ]; then
+		json_add_string error "$(tail -n 5 "$WOLWRT_STATE/$1.log" | sed 's/^wolwrt: //')"
+	fi
+}
+
+tg_test() {
+	tg_ready || {
+		echo setup
+		return 1
+	}
+	if lang_ru; then
+		tg_send "WOLwrt: проверка связи"
+	else
+		tg_send "WOLwrt: test message"
+	fi
+}
+
+clients() {
+	local obj macs mac ip host via line lan out freq
+	for obj in $(ubus list 'hostapd.*' 2>/dev/null); do
+		out=$(ubus call "$obj" get_clients)
+		freq=$(echo "$out" | jsonfilter -e '@.freq')
+		for mac in $(echo "$out" | grep -oE '"([0-9a-f]{2}:){5}[0-9a-f]{2}": \{' | cut -c2-18); do
+			macs="$macs $mac=$freq"
+		done
+	done
+	network_get_device lan lan
+	for mac in $(ip -4 neigh show dev "${lan:-br-lan}" | awk '/REACHABLE|STALE|DELAY/ && $2 == "lladdr" { print $3 }'); do
+		case "$macs" in *" $mac="*) ;; *) macs="$macs $mac=lan" ;; esac
+	done
+	json_init
+	json_add_array clients
+	for line in $macs; do
+		mac=${line%=*}
+		via=${line#*=}
+		ip=$(awk -v m="$mac" '$2 == m { print $3; exit }' /tmp/dhcp.leases)
+		host=$(awk -v m="$mac" '$2 == m && $4 != "*" { print $4; exit }' /tmp/dhcp.leases)
+		[ -n "$ip" ] || ip=$(ip -4 neigh show | awk -v m="$mac" '$5 == m { print $1; exit }')
+		json_add_object
+		json_add_string mac "$mac"
+		json_add_string ip "$ip"
+		json_add_string host "$host"
+		[ "$via" = lan ] || json_add_int freq "$via"
+		json_close_object
+	done
+	json_close_array
+	json_dump
+}
+
+case "$1" in
+_job)
+	name=$2
+	shift 2
+	config_load wolwrt
+	"$@" > "$WOLWRT_STATE/$name.log" 2>&1
+	echo $? > "$WOLWRT_STATE/$name.rc"
+	;;
+list)
+	cat <<-EOF
+		{
+			"status": {},
+			"history": { "n": 50 },
+			"clients": {},
+			"wake": { "target": "id" },
+			"sleep": { "target": "id" },
+			"cancel": { "target": "id" },
+			"run": { "rule": "id" },
+			"pubkey": {},
+			"tg_test": {},
+			"curl": {},
+			"install_curl": {},
+			"update_info": {},
+			"update_check": {},
+			"update_install": {}
+		}
+	EOF
+	;;
+call)
+	read -r input
+	json_load "${input:-{\}}"
+	config_load wolwrt
+	case "$2" in
+	status)
+		cat "$WOLWRT_STATE/status.json" 2>/dev/null || echo '{ "error": "wolwrtd is not running" }'
+		;;
+	history)
+		json_get_var n n
+		printf '{ "events": [ '
+		tail -n "${n:-50}" "$WOLWRT_STATE/history" 2>/dev/null | sed '$!s/$/,/'
+		printf ' ] }\n'
+		;;
+	clients)
+		clients
+		;;
+	wake | sleep | cancel)
+		json_get_var target target
+		reply_cli wolwrt "$2" "$target"
+		;;
+	run)
+		json_get_var rule rule
+		reply_cli wolwrt run "$rule" force
+		;;
+	pubkey)
+		json_init
+		json_add_string pubkey "$(wolwrt pubkey)"
+		json_dump
+		;;
+	tg_test)
+		reply_cli tg_test
+		;;
+	curl)
+		json_init
+		json_add_boolean installed "$(command -v curl >/dev/null && echo 1 || echo 0)"
+		job_state curl installing
+		json_dump
+		;;
+	install_curl)
+		job_start curl pkg_install curl
+		echo '{ "ok": true }'
+		;;
+	update_info)
+		read -r current < /usr/lib/wolwrt/version
+		f=$WOLWRT_STATE/latest.json
+		json_init
+		json_add_string current "$current"
+		json_add_string build "$(date -r /www/luci-static/resources/wolwrt.js +%s 2>/dev/null)"
+		if [ -f "$f" ]; then
+			latest=$(jsonfilter -i "$f" -e '@.latest')
+			json_add_string latest "$latest"
+			json_add_boolean available "$([ "$latest" != "$current" ] && echo 1 || echo 0)"
+			json_add_string published "$(jsonfilter -i "$f" -e '@.published')"
+			json_add_string notes "$(jsonfilter -i "$f" -e '@.notes')"
+			json_add_string url "$(jsonfilter -i "$f" -e '@.url')"
+			json_add_int checked "$(jsonfilter -i "$f" -e '@.checked')"
+		fi
+		job_state check checking
+		json_dump
+		;;
+	update_check)
+		job_start check wolwrt update check
+		echo '{ "ok": true }'
+		;;
+	update_install)
+		start-stop-daemon -S -b -x /usr/sbin/wolwrt -- update install
+		echo '{ "ok": true }'
+		;;
+	*)
+		echo '{ "error": "unknown method" }'
+		;;
+	esac
+	;;
+esac

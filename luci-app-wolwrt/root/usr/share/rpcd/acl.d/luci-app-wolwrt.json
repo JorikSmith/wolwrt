@@ -1,0 +1,20 @@
+{
+	"luci-app-wolwrt": {
+		"description": "Grant access to WOLwrt",
+		"read": {
+			"ubus": {
+				"wolwrt": [ "status", "history", "clients", "pubkey", "curl", "update_info" ]
+			},
+			"file": {
+				"/var/run/wolwrt/update.json": [ "read" ]
+			},
+			"uci": [ "wolwrt", "system" ]
+		},
+		"write": {
+			"ubus": {
+				"wolwrt": [ "wake", "sleep", "cancel", "run", "tg_test", "install_curl", "update_check", "update_install" ]
+			},
+			"uci": [ "wolwrt" ]
+		}
+	}
+}

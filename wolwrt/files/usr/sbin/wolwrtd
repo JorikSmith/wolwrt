@@ -1,0 +1,416 @@
+#!/bin/sh
+
+. /usr/lib/wolwrt/common.sh
+
+FIFO=$WOLWRT_STATE/events
+TICK=10
+BOOT_GRACE=300
+
+DEVICES=
+GRPS=
+TARGETS=
+
+load_device() {
+	local macs mac
+	config_get macs "$1" mac
+	macs=$(echo $macs | tr 'ABCDEF-' 'abcdef:')
+	[ -n "$macs" ] || return
+	for mac in $macs; do
+		eval "mac_${mac//:/}=$1"
+	done
+	config_get "dev_name_$1" "$1" name "$1"
+	config_get "dev_timeout_$1" "$1" away_timeout "$AWAY_TIMEOUT"
+	eval "dev_mac_$1=\"$macs\" dev_state_$1=unknown dev_groups_$1="
+	DEVICES="$DEVICES $1"
+	[ -n "$PREV" ] || return
+	st= se= si=
+	eval "$(jsonfilter -s "$PREV" -e "st=@.devices.$1.state" -e "se=@.devices.$1.seen" -e "si=@.devices.$1.since" 2>/dev/null)"
+	case "$st" in
+	online | leaving) eval "dev_state_$1=leaving dev_seen_$1=\$se dev_since_$1=\$si" ;;
+	away) eval "dev_state_$1=away dev_seen_$1=\$se dev_since_$1=\$si" ;;
+	esac
+}
+
+load_group() {
+	local members m
+	config_get "grp_name_$1" "$1" name "$1"
+	config_get members "$1" member
+	for m in $members; do
+		eval "[ -n \"\$dev_mac_$m\" ]" || continue
+		eval "dev_groups_$m=\"\$dev_groups_$m $1\" grp_members_$1=\"\$grp_members_$1 $m\""
+	done
+	eval "grp_online_$1=0"
+	GRPS="$GRPS $1"
+}
+
+load_target() {
+	local on= si=
+	config_get "tgt_name_$1" "$1" name "$1"
+	config_get "tgt_mac_$1" "$1" mac
+	config_get "tgt_cfgip_$1" "$1" ip
+	config_get "tgt_net_$1" "$1" network lan
+	[ -n "$PREV" ] && eval "$(jsonfilter -s "$PREV" -e "on=@.targets.$1.online" -e "si=@.targets.$1.since" 2>/dev/null)"
+	case "$on" in
+	true) on=1 ;;
+	false) on=0 ;;
+	esac
+	eval "tgt_online_$1=$on tgt_since_$1=${si:-$NOW} tgt_offat_$1="
+	TARGETS="$TARGETS $1"
+}
+
+start_sub() {
+	SUB_SIG=$(ubus -v list 'hostapd.*' 2>/dev/null | grep "^'")
+	SUB_PID=
+	if [ -n "$SUB_SIG" ]; then
+		ubus subscribe $(ubus list 'hostapd.*') >&3 2>/dev/null &
+		SUB_PID=$!
+	fi
+	echo "$TICK_PID $SUB_PID" > "$WOLWRT_STATE/pids"
+}
+
+check_sub() {
+	local sig
+	sig=$(ubus -v list 'hostapd.*' 2>/dev/null | grep "^'")
+	[ "$sig" = "$SUB_SIG" ] && { [ -z "$SUB_PID" ] || kill -0 "$SUB_PID" 2>/dev/null; } && return
+	[ -n "$SUB_PID" ] && kill "$SUB_PID" 2>/dev/null
+	start_sub
+}
+
+rule_match() {
+	local enabled trigger source
+	config_get_bool enabled "$1" enabled 1
+	config_get trigger "$1" trigger
+	[ "$enabled" = 1 ] && [ "$trigger" = "$FIRE_TRIGGER" ] || return
+	if [ "$trigger" = schedule ]; then
+		config_get source "$1" at
+	else
+		config_get source "$1" source
+	fi
+	[ "$source" = "$FIRE_SOURCE" ] || return
+	if ! rule_allowed "$1"; then
+		log_event off rule_skipped "$1" "$RULE_DENY"
+		return
+	fi
+	rule_run "$1" >/dev/null 2>&1 &
+}
+
+fire() {
+	FIRE_TRIGGER=$1
+	FIRE_SOURCE=$2
+	config_foreach rule_match rule
+}
+
+group_change() {
+	local id=$1 dir=$2 g n
+	eval "gs=\$dev_groups_$id"
+	for g in $gs; do
+		eval "n=\$grp_online_$g"
+		if [ "$dir" = arrive ]; then
+			n=$((n + 1))
+			[ $n -eq 1 ] && log_event ok first_arrive "$g" && fire first_arrive "$g"
+		else
+			n=$((n - 1))
+			[ $n -eq 0 ] && log_event warn last_leave "$g" && fire last_leave "$g"
+		fi
+		eval "grp_online_$g=$n"
+	done
+}
+
+dev_seen() {
+	local id=$1 state
+	eval "state=\$dev_state_$id"
+	eval "dev_seen_$id=$NOW dev_src_$id=\$2 dev_iface_$id=\$3 dev_freq_$id=\$4 dev_signal_$id=\$5"
+	case "$state" in
+	online) ;;
+	leaving) eval "dev_state_$id=online" ;;
+	*)
+		eval "dev_state_$id=online dev_since_$id=$NOW"
+		[ "$state" = unknown ] && return
+		log_event ok arrive "$id" "$2${3:+ $3}"
+		fire arrive "$id"
+		group_change "$id" arrive
+		;;
+	esac
+}
+
+dev_gone() {
+	local id=$1 state
+	eval "state=\$dev_state_$id"
+	case "$state" in
+	online) eval "dev_state_$id=leaving" ;;
+	unknown) eval "dev_state_$id=away dev_since_$id=$NOW dev_seen_$id=" ;;
+	esac
+}
+
+wake_retry() {
+	local t=$1 tries=$2 at=$3 mac net dev
+	eval "mac=\$tgt_mac_$t net=\$tgt_net_$t"
+	network_get_device dev "$net" && etherwake -i "$dev" "$mac" || return
+	echo "wolwrt $at $((tries + 1))" > "$WOLWRT_STATE/woken.$t"
+	log_event ok wake_retry "$t" "$((tries + 1))"
+}
+
+pending_off() {
+	local t=$1 online=$2 at delay
+	eval "tgt_offat_$t="
+	read -r at delay 2>/dev/null < "$WOLWRT_STATE/pending.$t" || return
+	if [ "$online" = 1 ] && [ $((at + delay + 120)) -gt "$NOW" ]; then
+		wolwrt pending "$t" || return
+		eval "tgt_offat_$t=$((at + delay))"
+	else
+		rm -f "$WOLWRT_STATE/pending.$t"
+	fi
+}
+
+target_poll() {
+	local t=$1 ip prev online woken at tries mac cfgip
+	eval "mac=\$tgt_mac_$t cfgip=\$tgt_cfgip_$t prev=\$tgt_online_$t"
+	ip=$(target_ip "$mac" "$cfgip")
+	eval "tgt_ip_$t=\$ip"
+	[ -n "$ip" ] || return
+	target_online "$ip" && online=1 || online=0
+	read -r woken at tries 2>/dev/null < "$WOLWRT_STATE/woken.$t"
+	pending_off "$t" "$online"
+	if [ "$online" != "$prev" ]; then
+		eval "tgt_online_$t=$online tgt_since_$t=$NOW"
+		if [ $online = 1 ]; then
+			[ -n "$woken" ] || echo "manual $NOW" > "$WOLWRT_STATE/woken.$t"
+			[ -n "$prev" ] && log_event ok target_online "$t" "${woken:-manual}" && fire target_online "$t"
+		elif [ "$prev" = 1 ]; then
+			rm -f "$WOLWRT_STATE/woken.$t"
+			log_event warn target_offline "$t"
+			fire target_offline "$t"
+		fi
+	elif [ $online = 0 ] && [ "$woken" = wolwrt ]; then
+		tries=${tries:-0}
+		if [ $((NOW - at)) -gt $BOOT_GRACE ]; then
+			rm -f "$WOLWRT_STATE/woken.$t"
+			log_event bad no_response "$t"
+		elif [ "$tries" -lt 2 ] && [ $((NOW - at)) -ge $((60 * (tries + 1))) ]; then
+			wake_retry "$t" "$tries" "$at"
+		fi
+	fi
+}
+
+poll() {
+	local obj freq keys k sig key id seen= hits= hit ip macs mac
+	LAST_POLL=$NOW
+	for obj in $(ubus list 'hostapd.*' 2>/dev/null); do
+		json_load "$(ubus call "$obj" get_clients)" || continue
+		json_get_var freq freq
+		json_select clients || continue
+		json_get_keys keys
+		for k in $keys; do
+			json_select "$k"
+			sig=
+			json_get_var sig signal
+			json_select ..
+			eval "id=\$mac_${k//_/}"
+			[ -n "$id" ] && hits="$hits $id|${obj#hostapd.}|$freq|$sig"
+		done
+	done
+	for hit in $hits; do
+		IFS='|' read -r id obj freq sig <<-EOF
+			$hit
+		EOF
+		dev_seen "$id" hostapd "$obj" "$freq" "$sig"
+		seen="$seen $id "
+	done
+	for id in $DEVICES; do
+		case "$seen" in *" $id "*) continue ;; esac
+		eval "macs=\$dev_mac_$id"
+		for mac in $macs; do
+			ip=$(target_ip "$mac")
+			[ -n "$ip" ] && target_online "$ip" && break
+			ip=
+		done
+		if [ -n "$ip" ]; then
+			dev_seen "$id" arp "$ip" "" ""
+		else
+			dev_gone "$id"
+		fi
+	done
+	for id in $TARGETS; do
+		target_poll "$id"
+	done
+}
+
+check_away() {
+	local id state seen timeout
+	for id in $DEVICES; do
+		eval "state=\$dev_state_$id seen=\$dev_seen_$id timeout=\$dev_timeout_$id"
+		[ "$state" = leaving ] && [ $((NOW - seen)) -ge "$timeout" ] || continue
+		eval "dev_state_$id=away dev_since_$id=$NOW"
+		log_event warn leave "$id"
+		fire leave "$id"
+		group_change "$id" leave
+	done
+}
+
+on_wifi() {
+	local line=$1 mac sig= freq= id
+	mac=${line#*\"address\":}
+	mac=${mac# }
+	mac=${mac#\"}
+	mac=${mac%%\"*}
+	case "$mac" in
+	[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]) ;;
+	*) return ;;
+	esac
+	eval "id=\$mac_${mac//:/}"
+	[ -n "$id" ] || return
+	NOW=$(date +%s)
+	if [ "$2" = in ]; then
+		case "$line" in *'"signal":'*)
+			sig=${line#*\"signal\":}
+			sig=${sig# }
+			sig=${sig%%[,\} ]*}
+			;;
+		esac
+		case "$line" in *'"freq":'*)
+			freq=${line#*\"freq\":}
+			freq=${freq# }
+			freq=${freq%%[,\} ]*}
+			;;
+		esac
+		dev_seen "$id" hostapd "" "$freq" "$sig"
+	else
+		eval "dev_seen_$id=$NOW"
+		dev_gone "$id"
+	fi
+	LAST_POLL=0
+	write_status
+}
+
+status_rule() {
+	local last
+	read -r last 2>/dev/null < "$WOLWRT_STATE/rule.$1" || return
+	json_add_object "$1"
+	json_add_string last "$last"
+	json_close_object
+}
+
+write_status() {
+	local id v
+	json_init
+	json_add_int ts "$NOW"
+	json_add_string hm "$(date +%H:%M)"
+	json_add_string day "$(date +%a | tr 'A-Z' 'a-z')"
+	json_add_object devices
+	for id in $DEVICES; do
+		json_add_object "$id"
+		for v in name mac state since seen src iface freq signal timeout; do
+			eval "json_add_string $v \"\$dev_${v}_$id\""
+		done
+		json_close_object
+	done
+	json_close_object
+	json_add_object groups
+	for id in $GRPS; do
+		json_add_object "$id"
+		eval "json_add_string name \"\$grp_name_$id\""
+		eval "json_add_int online \"\$grp_online_$id\""
+		json_add_array members
+		eval "for v in \$grp_members_$id; do json_add_string '' \"\$v\"; done"
+		json_close_array
+		json_close_object
+	done
+	json_close_object
+	json_add_object targets
+	for id in $TARGETS; do
+		json_add_object "$id"
+		for v in name ip since; do
+			eval "json_add_string $v \"\$tgt_${v}_$id\""
+		done
+		eval "json_add_boolean online \"\${tgt_online_$id:-0}\""
+		eval "[ -n \"\$tgt_offat_$id\" ] && json_add_int off_at \"\$tgt_offat_$id\""
+		read -r v _ 2>/dev/null < "$WOLWRT_STATE/woken.$id" && json_add_string woken_by "$v"
+		json_close_object
+	done
+	json_close_object
+	json_add_object rules
+	config_foreach status_rule rule
+	json_close_object
+	json_dump > "$WOLWRT_STATE/status.json.tmp"
+	mv "$WOLWRT_STATE/status.json.tmp" "$WOLWRT_STATE/status.json"
+}
+
+on_tick() {
+	local min m
+	NOW=$(date +%s)
+	min=$((NOW / 60))
+	if [ "$min" != "$LAST_MIN" ]; then
+		m=$((LAST_MIN + 1))
+		[ $((min - m)) -lt 5 ] || m=$min
+		while [ $m -le $min ]; do
+			fire schedule "$(date -d @$((m * 60)) +%H:%M)"
+			m=$((m + 1))
+		done
+		LAST_MIN=$min
+	fi
+	check_sub
+	[ $((NOW - LAST_POLL)) -ge "$POLL_INTERVAL" ] && poll
+	check_away
+	write_status
+	if [ "$UPDATE_AUTO" = 1 ] && [ $((NOW - LAST_UPDATE)) -ge 86400 ]; then
+		LAST_UPDATE=$NOW
+		wolwrt update check >/dev/null 2>&1 &
+	fi
+}
+
+cleanup() {
+	kill $TICK_PID $SUB_PID 2>/dev/null
+	rm -f "$FIFO" "$WOLWRT_STATE/pids"
+}
+
+NOW=$(date +%s)
+config_load wolwrt
+config_get AWAY_TIMEOUT main away_timeout 300
+config_get POLL_INTERVAL main poll_interval 30
+config_get_bool UPDATE_AUTO main update_auto 1
+LAST_UPDATE=$(jsonfilter -i "$WOLWRT_STATE/latest.json" -e '@.checked' 2>/dev/null)
+LAST_UPDATE=${LAST_UPDATE:-0}
+PREV=$(cat "$WOLWRT_STATE/status.json" 2>/dev/null)
+[ $((NOW - $(jsonfilter -s "${PREV:-{\}}" -e '@.ts' 2>/dev/null || echo 0))) -lt 600 ] || PREV=
+config_foreach load_device device
+config_foreach load_group group
+config_foreach load_target target
+
+mkdir -p "$WOLWRT_STATE"
+read -r pids 2>/dev/null < "$WOLWRT_STATE/pids" && kill $pids 2>/dev/null
+rm -f "$FIFO"
+mkfifo "$FIFO"
+exec 3<>"$FIFO"
+trap cleanup EXIT
+trap 'exit 0' TERM INT
+
+while sleep $TICK; do echo tick; done >&3 &
+TICK_PID=$!
+start_sub
+
+count_groups() {
+	local id m n
+	for id in $GRPS; do
+		n=0
+		eval "ms=\$grp_members_$id"
+		for m in $ms; do
+			eval "case \"\$dev_state_$m\" in online|leaving) n=\$((n + 1)) ;; esac"
+		done
+		eval "grp_online_$id=$n"
+	done
+}
+
+count_groups
+poll
+count_groups
+LAST_MIN=$((NOW / 60))
+write_status
+logger -t wolwrt "started: $(echo $DEVICES | wc -w) devices, $(echo $TARGETS | wc -w) targets"
+
+while read -r line <&3; do
+	case "$line" in
+	tick) on_tick ;;
+	'{ "assoc":'*) on_wifi "$line" in ;;
+	'{ "disassoc":'* | '{ "deauth":'*) on_wifi "$line" out ;;
+	esac
+done

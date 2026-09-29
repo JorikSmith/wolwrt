@@ -1,0 +1,270 @@
+#!/bin/sh
+
+. /usr/lib/wolwrt/common.sh
+
+usage() {
+	cat >&2 <<EOF
+Usage: wolwrt <command> [args]
+
+  wake <target>         send magic packet
+  sleep <target>        turn target off with its method
+  cancel <target>       cancel pending Windows shutdown
+  check <target>        exit 0 if target is online
+  idle <target>         minutes since last input at Windows console
+  run <rule> [force]    run rule; force ignores days, time window and pause
+  status                state from wolwrtd as JSON
+  history [n]           last n events as JSON lines
+  pubkey                router SSH public key, created on first call
+  update check          look for newer release on GitHub
+  update install        download, verify and install latest release
+EOF
+	exit 1
+}
+
+cmd_wake() {
+	local dev
+	target_load "$1"
+	[ -n "$mac" ] || die "$1: MAC address not set"
+	if [ -n "$ip" ] && target_online "$ip"; then
+		echo "$1 is already online" >&2
+		return 0
+	fi
+	network_get_device dev "$network" || die "$1: network $network is down"
+	if ! etherwake -i "$dev" "$mac"; then
+		log_event bad wake_failed "$1" "$dev $mac"
+		die "$1: etherwake failed"
+	fi
+	mkdir -p "$WOLWRT_STATE"
+	echo "wolwrt $(date +%s) 0" > "$WOLWRT_STATE/woken.$1"
+	log_event ok wake "$1" "$dev $mac"
+}
+
+warn_lines() {
+	if lang_ru; then
+		printf '%s
+' "WOLwrt выключит компьютер через {0} с" "Отменить" "Выключить сейчас"
+	else
+		printf '%s
+' "WOLwrt will shut down this computer in {0} s" "Cancel" "Shut down now"
+	fi
+}
+
+hex() {
+	hexdump -v -e '/1 "%02x"' "$@"
+}
+
+win_warn() {
+	local ps txt
+	ps=$(hex /usr/share/wolwrt/warn.ps1)
+	txt=$(warn_lines | hex)
+	ssh_run "powershell -NoProfile -Command \"\$d=\$env:ProgramData+'\WOLwrt'; New-Item -ItemType Directory -Force \$d | Out-Null; Remove-Item -Force -ErrorAction SilentlyContinue (\$d+'\cancelled'); foreach (\$p in @(@('warn.ps1','$ps'),@('warn.txt','$txt'))) { [IO.File]::WriteAllBytes(\$d+'\'+\$p[0], [byte[]](\$p[1] -split '(..)' -ne '' | ForEach-Object { [Convert]::ToByte(\$_, 16) })) }\" & schtasks /create /f /tn WOLwrt /sc once /st 00:00 /it /tr \"powershell -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File %ProgramData%\WOLwrt\warn.ps1 $warn_delay\" & schtasks /run /tn WOLwrt" >/dev/null
+}
+
+cmd_sleep() {
+	local rc detail
+	target_load "$1"
+	case "$off_method" in
+	ssh)
+		[ -n "$ssh_cmd" ] || die "$1: SSH command not set"
+		ssh_run "$ssh_cmd" >/dev/null
+		rc=$?
+		detail="ssh $ssh_user@$ip: $ssh_cmd"
+		;;
+	winwarn)
+		ssh_run "shutdown /s /t $warn_delay" >/dev/null
+		rc=$?
+		[ $rc -eq 0 ] && win_warn
+		detail="shutdown /s /t $warn_delay"
+		;;
+	http)
+		[ -n "$http_url" ] || die "$1: URL not set"
+		http_call "$http_method" "$http_url" "$http_body"
+		rc=$?
+		detail="$http_method $http_url"
+		;;
+	sol)
+		[ -n "$ip" ] || die "$1: no IP address"
+		http_call GET "http://$ip:$sol_port/sleep"
+		rc=$?
+		detail="sleep-on-lan $ip:$sol_port"
+		;;
+	*)
+		die "$1: no off method"
+		;;
+	esac
+	[ $rc -ne 0 ] && [ -n "$ip" ] && sleep 3 && ! target_online "$ip" && rc=0
+	if [ $rc -ne 0 ]; then
+		log_event bad sleep_failed "$1" "$detail"
+		die "$1: could not turn off ($detail)"
+	fi
+	if [ "$off_method" = winwarn ]; then
+		echo "$(date +%s) $warn_delay" > "$WOLWRT_STATE/pending.$1"
+	else
+		rm -f "$WOLWRT_STATE/woken.$1"
+	fi
+	log_event ok sleep "$1" "$detail"
+}
+
+cmd_cancel() {
+	local rc
+	target_load "$1"
+	ssh_run "schtasks /end /tn WOLwrt >nul 2>&1 & shutdown /a" >/dev/null
+	rc=$?
+	[ $rc -eq 0 ] || [ $rc -eq 92 ] || die "$1: could not cancel"
+	rm -f "$WOLWRT_STATE/pending.$1"
+	[ $rc -eq 0 ] && log_event ok off_cancelled "$1"
+	return 0
+}
+
+cmd_pending() {
+	target_load "$1"
+	[ -f "$WOLWRT_STATE/pending.$1" ] || return 1
+	ssh_run "if exist %ProgramData%\WOLwrt\cancelled (del %ProgramData%\WOLwrt\cancelled & exit 3)" >/dev/null
+	[ $? -eq 3 ] || return 0
+	rm -f "$WOLWRT_STATE/pending.$1"
+	log_event ok off_cancelled "$1" target
+	return 1
+}
+
+cmd_check() {
+	target_load "$1"
+	[ -n "$ip" ] || die "$1: no IP address"
+	target_online "$ip"
+}
+
+cmd_idle() {
+	local out
+	target_load "$1"
+	case "$off_method" in
+	ssh | winwarn) ;;
+	*) die "$1: idle check needs SSH" ;;
+	esac
+	out=$(ssh_run quser) || die "$1: no answer over SSH"
+	echo "$out" | awk '
+		{ sub(/^>/, "") }
+		$2 == "console" {
+			v = $5
+			if (v ~ /^[0-9]+$/) m = v
+			else if (v ~ /^[0-9]+:[0-9]+$/) { split(v, a, ":"); m = a[1] * 60 + a[2] }
+			else if (v ~ /\+/) { split(v, a, /[+:]/); m = a[1] * 1440 + a[2] * 60 + a[3] }
+			else m = 0
+			found = 1
+		}
+		END { print found ? m : 99999 }'
+}
+
+update_state() {
+	json_init
+	json_add_string phase "$1"
+	[ -n "$2" ] && json_add_string message "$2"
+	json_dump > "$WOLWRT_STATE/update.json"
+}
+
+update_fail() {
+	update_state failed "$1"
+	rm -rf /tmp/wolwrt-update
+	die "$1"
+}
+
+cmd_update_check() {
+	local repo current release latest
+	config_get repo main update_repo "$WOLWRT_REPO"
+	read -r current < /usr/lib/wolwrt/version
+	mkdir -p "$WOLWRT_STATE"
+	release=$(fetch_ext - "https://api.github.com/repos/$repo/releases/latest") ||
+		die "no releases found or GitHub is unreachable"
+	latest=$(echo "$release" | jsonfilter -e '@.tag_name')
+	latest=${latest#v}
+	[ -n "$latest" ] || die "release has no tag"
+	echo "$release" > "$WOLWRT_STATE/release.json"
+	json_init
+	json_add_string current "$current"
+	json_add_string latest "$latest"
+	json_add_boolean available "$([ "$latest" != "$current" ] && echo 1 || echo 0)"
+	json_add_string published "$(echo "$release" | jsonfilter -e '@.published_at')"
+	json_add_string notes "$(echo "$release" | jsonfilter -e '@.body')"
+	json_add_string url "$(echo "$release" | jsonfilter -e '@.html_url')"
+	json_add_int checked "$(date +%s)"
+	json_dump > "$WOLWRT_STATE/latest.json"
+	echo "$current -> $latest"
+}
+
+cmd_update_install() {
+	local ext pm dir=/tmp/wolwrt-update rel=$WOLWRT_STATE/release.json name url digest pkg
+	if command -v apk >/dev/null; then
+		ext=apk pm="apk add --allow-untrusted"
+	else
+		ext=ipk pm="opkg install"
+	fi
+	[ -f "$rel" ] || die "run: wolwrt update check"
+	rm -rf "$dir"
+	mkdir -p "$dir"
+	update_state download
+	for name in $(jsonfilter -i "$rel" -e '@.assets[*].name' | grep "\.$ext\$"); do
+		pkg=${name%.$ext}
+		if [ "$pkg" != wolwrt ]; then
+			if [ "$ext" = apk ]; then
+				apk info -e "$pkg" >/dev/null 2>&1 || continue
+			else
+				opkg status "$pkg" 2>/dev/null | grep -q '^Status:.* installed' || continue
+			fi
+		fi
+		url=$(jsonfilter -i "$rel" -e "@.assets[@.name='$name'].browser_download_url")
+		digest=$(jsonfilter -i "$rel" -e "@.assets[@.name='$name'].digest")
+		fetch_ext "$dir/$name" "$url" || update_fail "download failed: $name"
+		update_state verify
+		[ -z "$digest" ] || [ "sha256:$(sha256sum "$dir/$name" | cut -d' ' -f1)" = "$digest" ] ||
+			update_fail "checksum mismatch: $name"
+	done
+	ls "$dir"/*."$ext" >/dev/null 2>&1 || update_fail "release has no .$ext packages"
+	update_state install
+	$pm "$dir"/*."$ext" >/dev/null 2>&1 || update_fail "$pm failed"
+	rm -rf "$dir"
+	update_state restart
+	/etc/init.d/wolwrt restart
+	update_state done "$(cat /usr/lib/wolwrt/version)"
+	log_event ok update wolwrt "$(cat /usr/lib/wolwrt/version)"
+}
+
+cmd_pubkey() {
+	if [ ! -f "$WOLWRT_KEY" ]; then
+		mkdir -p "${WOLWRT_KEY%/*}"
+		dropbearkey -t ed25519 -f "$WOLWRT_KEY" >/dev/null 2>&1 || die "dropbearkey failed"
+	fi
+	dropbearkey -y -f "$WOLWRT_KEY" | grep '^ssh-'
+}
+
+config_load wolwrt
+
+case "$1" in
+wake | sleep | cancel | pending | check | idle)
+	[ -n "$2" ] || usage
+	cmd_$1 "$2"
+	;;
+run)
+	[ -n "$2" ] || usage
+	config_get type "$2" TYPE
+	[ "$type" = rule ] || die "unknown rule: $2"
+	[ "$3" = force ] || rule_allowed "$2" || die "$2: not allowed now ($RULE_DENY)"
+	rule_run "$2"
+	;;
+update)
+	case "$2" in
+	check) cmd_update_check ;;
+	install) cmd_update_install ;;
+	*) usage ;;
+	esac
+	;;
+status)
+	cat "$WOLWRT_STATE/status.json" 2>/dev/null || die "wolwrtd is not running"
+	;;
+history)
+	tail -n "${2:-20}" "$WOLWRT_STATE/history" 2>/dev/null
+	;;
+pubkey)
+	cmd_pubkey
+	;;
+*)
+	usage
+	;;
+esac

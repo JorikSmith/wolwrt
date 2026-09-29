@@ -1,0 +1,38 @@
+#!/bin/sh
+
+. /usr/lib/wolwrt/common.sh
+
+reply() {
+	printf 'Status: %s\r\nContent-Type: application/json\r\n\r\n' "$1"
+	json_init
+	json_add_boolean ok "$2"
+	json_add_string message "$3"
+	json_dump
+	exit 0
+}
+
+param() {
+	echo "$QUERY_STRING" | tr '&' '\n' | sed -n "s/^$1=//p" | head -n 1
+}
+
+config_load wolwrt
+config_get_bool enabled main http_enabled 0
+config_get token main http_token
+[ "$enabled" = 1 ] && [ -n "$token" ] || reply "403 Forbidden" 0 "HTTP access is off"
+[ "$(param token)" = "$token" ] || reply "403 Forbidden" 0 "wrong token"
+
+action=$(param action)
+case "$action" in
+wake | sleep | cancel) id=$(param target) ;;
+run) id=$(param rule) ;;
+*) reply "400 Bad Request" 0 "action must be wake, sleep, cancel or run" ;;
+esac
+case "$id" in
+'' | *[!A-Za-z0-9_]*) reply "400 Bad Request" 0 "bad target or rule id" ;;
+esac
+
+if out=$(wolwrt "$action" "$id" 2>&1); then
+	reply "200 OK" 1 "${out:-done}"
+else
+	reply "409 Conflict" 0 "${out#wolwrt: }"
+fi
